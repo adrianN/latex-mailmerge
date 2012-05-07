@@ -1,11 +1,15 @@
+# -*- coding: utf-8 -*-
 import sys
 import re
 import csv
 from collections import defaultdict
 
-def parse(filename):
+class OOCalc(csv.excel):
+  delimiter = ';'
+
+def parse(filename, d):
     f = open(filename,'r+b')
-    reader = csv.DictReader(f)
+    reader = csv.DictReader(f, dialect = d)
     rows = list(reader)
     values = defaultdict(list)
     for row in rows:
@@ -69,8 +73,15 @@ def produce_tex(text, var_table):
 
 
 if len(sys.argv) < 3:
-    print "Usage: python mailmerge.py template.tex data.csv"
-    exit
+    print "Usage: python mailmerge.py [-oocalc] template.tex data.csv"
+    print "The -oocalc switch makes this work with csv produced by oocalc"
+    sys.exit(-1)
+
+try:
+  sys.argv.remove('-oocalc')
+  dialect = OOCalc
+except ValueError:
+  dialect = csv.excel
     
 template_file = sys.argv[1]
 variables_table = sys.argv[2]
@@ -80,7 +91,8 @@ print "Producing output from template file", template_file, "and data", variable
 f = open(template_file, 'r+b')
 template_text = f. read()
 f.close()
-variables = parse(variables_table)
+variables = parse(variables_table, dialect)
+print 'Available variables', variables.keys()
 
 print "Will produce",str(min((len(variables[column]) for column in variables))),"pages output"
 
