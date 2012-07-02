@@ -54,8 +54,11 @@ def all_copies(template, var_table):
         v = {}
         for k in var_table.iterkeys():
             v[k] = var_table[k][i]
-
-        copies.append(fill_template(template,v))
+        try:
+		    copies.append(fill_template(template,v))
+        except:
+            print "Error while processing line", i, "of the csv"
+            raise
         
     return copies
 
