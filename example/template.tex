@@ -1,0 +1,59 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[landscape,left=3cm,right=3cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{palatino}
+\usepackage{scalefnt}
+
+\setlength{\parindent}{0pt}
+
+\newcommand{\LectureTitle}{Example Lecture}
+\newcommand{\Lecturers}{Smart Professor \and Clever Assistant}
+\newcommand{\LectureType}{Lecture}
+\newcommand{\CreditPoints}{9}
+
+\begin{document}
+  \thispagestyle{empty}
+  \begin{samepage}
+	%\includegraphics[height=2cm]{mpii-presentation-logo}%
+	%\hfill
+	%\includegraphics[height=2cm]{uds-cs-logo}%
+	\vspace*[2cm]
+
+    \begin{center}
+      \scalefont{3} \textbf{\LectureTitle}
+    \end{center}
+
+    \begin{center}
+      \scalefont{2}\bfseries
+      \lineskip .75em%
+      \begin{tabular}[t]{c}%
+        \Lecturers
+      \end{tabular}%
+    \end{center}
+
+    \vspace{1cm}
+    \begin{samepage}
+	\scalefont{1.5}
+	\begin{python}Name\end{python}, \begin{python}Firstname\end{python} (Matriculation number \begin{python}Matriculation\end{python}) attended the \LectureType\bigskip
+	\begin{center}
+	 \textbf{\LectureTitle}
+	\end{center}\bigskip
+	with \CreditPoints{} CP \begin{python}'successfully' if float(Grade)<4.5 else ''\end{python}.\\
+	\begin{python}'She' if Gender=='female' else 'He'\end{python} got the grade
+	\begin{center}
+	 \begin{python}"%(x).1f" % {"x":float(Grade)}\end{python}
+	\end{center}
+	\vspace{3cm plus 0.7cm minus 0.7cm}
+
+    \newcommand{\layoutedLecturer}{\begingroup\renewcommand{\and}{\& }\footnotesize{\Lecturers}\endgroup}%
+    \hspace*{0pt plus 4fill}%
+    \begin{minipage}[b][1cm]{10cm}\normalsize
+      \today\\[-1ex]
+      \rule{\linewidth}{.5pt}\\
+      \footnotesize\strut\hfill\layoutedLecturer%
+    \end{minipage}%
+    \end{samepage}
+  \end{samepage}
+\end{document}

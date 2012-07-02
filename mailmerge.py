@@ -8,7 +8,7 @@ class OOCalc(csv.excel):
   delimiter = ';'
 
 def parse(filename, d):
-    f = open(filename,'r+b')
+    f = open(filename,'rb')
     reader = csv.DictReader(f, dialect = d)
     rows = list(reader)
     values = defaultdict(list)
@@ -88,7 +88,7 @@ variables_table = sys.argv[2]
 
 print "Producing output from template file", template_file, "and data", variables_table
 
-f = open(template_file, 'r+b')
+f = open(template_file, 'rb')
 template_text = f. read()
 f.close()
 variables = parse(variables_table, dialect)
