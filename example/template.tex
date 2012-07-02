@@ -36,6 +36,7 @@
     \vspace{1cm}
     \begin{samepage}
 	\scalefont{1.5}
+	%Simple Python expression can be used
 	\begin{python}Name\end{python}, \begin{python}Firstname\end{python} (Matriculation number \begin{python}Matriculation\end{python}) attended the \LectureType\bigskip
 	\begin{center}
 	 \textbf{\LectureTitle}
@@ -43,7 +44,17 @@
 	with \CreditPoints{} CP \begin{python}'successfully' if float(Grade)<4.5 else ''\end{python}.\\
 	\begin{python}'She' if Gender=='female' else 'He'\end{python} got the grade
 	\begin{center}
-	 \begin{python}"%(x).1f" % {"x":float(Grade)}\end{python}
+	 \begin{python}"%(x).1f" % {"x":float(Grade)}\end{python} (%
+	 %if the Python code gets too complicated for simple statements
+	 %you can also assign things to the magic variable "text"
+	 \begin{python}
+gr = float(Grade)
+if gr<1.5:
+  text = "Great"
+else:
+  text = "okay"
+	 \end{python}%
+	 )
 	\end{center}
 	\vspace{3cm plus 0.7cm minus 0.7cm}
 
