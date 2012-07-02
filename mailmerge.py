@@ -21,6 +21,8 @@ def parse(filename, d):
 
 
 def eval_region(text, vars):
+    if dry_run:
+      return r'\texttt{<Python>}'
     try:
         return str(eval(text,vars))
     except:
@@ -76,8 +78,12 @@ def produce_tex(text, var_table):
 
 
 if len(sys.argv) < 3:
-    print "Usage: python mailmerge.py [-oocalc] template.tex data.csv"
+    print "Usage:"
+    print "python mailmerge.py [-oocalc] template.tex data.csv"
+    print "or"
+    print "python mailmerge.py [-oocalc] -dry template.tex"
     print "The -oocalc switch makes this work with csv produced by oocalc"
+    print "The -dry switch produces output were all Python code is replaced by '<Python>'"
     sys.exit(-1)
 
 try:
@@ -85,19 +91,30 @@ try:
   dialect = OOCalc
 except ValueError:
   dialect = csv.excel
-    
+
+try:
+  sys.argv.remove('-dry')
+  dry_run = True
+  variables = {'dry':['dry']}
+  print "Dry run mode"
+except ValueError:
+  dry_run = False
+  variables_table = sys.argv[2]
+  variables = parse(variables_table, dialect)
+  print 'Available variables', variables.keys()
+ 
 template_file = sys.argv[1]
-variables_table = sys.argv[2]
-
-print "Producing output from template file", template_file, "and data", variables_table
-
 f = open(template_file, 'rb')
 template_text = f. read()
 f.close()
-variables = parse(variables_table, dialect)
-print 'Available variables', variables.keys()
 
-print "Will produce",str(min((len(variables[column]) for column in variables))),"pages output"
+print "Producing output from template file", template_file,
+if dry_run:
+  print '\n'
+else:
+  print "and data", variables_table
+print "Will produce",str(min((len(variables[column]) for column in variables))),"page(s) output"
+
 
 output = produce_tex(template_text, variables)
 f = open('out.tex','wb')
