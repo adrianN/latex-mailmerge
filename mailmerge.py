@@ -3,6 +3,7 @@ import sys
 import re
 import csv
 from collections import defaultdict
+import string
 
 class OOCalc(csv.excel):
   delimiter = ';'
@@ -19,8 +20,23 @@ def parse(filename, d):
     f.close()
     return values
 
+def strip_evil_whitespace(text):
+  def num_leading_whitespace(line):
+    i=0
+    while i<len(line) and line[i] in string.whitespace:
+      i+=1
+    return i
+
+  lines = [l for l in text.splitlines() if len(l)>0]
+  m = min(map(num_leading_whitespace, lines))
+  for i in xrange(len(lines)):
+    lines[i] = lines[i][m:]
+  
+  return '\n'.join(lines)
+
 
 def eval_region(text, vars):
+    text = strip_evil_whitespace(text)
     if dry_run:
       return r'\texttt{<Python>}'
     try:
