@@ -43,7 +43,7 @@ def eval_region(text, vars):
         return str(eval(text,vars))
     except:
         exec(text,vars)
-        return str(vars["text"])
+        return str(vars["_text"])
         
 
 
@@ -72,8 +72,9 @@ def all_copies(template, var_table):
         v = {}
         for k in var_table.iterkeys():
             v[k] = var_table[k][i]
+        v['_line'] = i
         try:
-		    copies.append(fill_template(template,v))
+	    copies.append(fill_template(template,v))
         except:
             print "Error while processing line", i, "of the csv"
             raise
@@ -103,21 +104,21 @@ if len(sys.argv) < 3:
     sys.exit(-1)
 
 try:
-  sys.argv.remove('-oocalc')
-  dialect = OOCalc
+    sys.argv.remove('-oocalc')
+    dialect = OOCalc
 except ValueError:
-  dialect = csv.excel
+    dialect = csv.excel
 
 try:
-  sys.argv.remove('-dry')
-  dry_run = True
-  variables = {'dry':['dry']}
-  print "Dry run mode"
+    sys.argv.remove('-dry')
+    dry_run = True
+    variables = {'dry':['dry']}
+    print "Dry run mode"
 except ValueError:
-  dry_run = False
-  variables_table = sys.argv[2]
-  variables = parse(variables_table, dialect)
-  print 'Available variables', variables.keys()
+    dry_run = False
+    variables_table = sys.argv[2]
+    variables = parse(variables_table, dialect)
+    print 'Available variables', variables.keys()
  
 template_file = sys.argv[1]
 f = open(template_file, 'rb')
@@ -129,7 +130,7 @@ if dry_run:
   print '\n'
 else:
   print "and data", variables_table
-print "Will produce",str(min((len(variables[column]) for column in variables))),"page(s) output"
+print "Will produce",str(min((len(variables[column]) for column in variables))),"\"pages\"(s) output"
 
 
 output = produce_tex(template_text, variables)

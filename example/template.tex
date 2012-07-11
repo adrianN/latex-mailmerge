@@ -46,13 +46,13 @@
 	\begin{center}
 	 \begin{python}"%(x).1f" % {"x":float(Grade)}\end{python} (%
 	 %if the Python code gets too complicated for simple statements
-	 %you can also assign things to the magic variable "text"
+	 %you can also assign things to the magic variable "_text"
 	 \begin{python}
 		gr = float(Grade)
 		if gr<1.5:
-			text = "Great"
+			_text = "Great"
 		else:
-			text = "okay"
+			_text = "okay"
 	 \end{python}%
 	 )
 	\end{center}
