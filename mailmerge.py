@@ -4,6 +4,7 @@ import re
 import csv
 from collections import defaultdict
 import string
+from optparse import OptionParser
 
 class OOCalc(csv.excel):
   delimiter = ';'
@@ -37,7 +38,7 @@ def strip_evil_whitespace(text):
 
 def eval_region(text, vars):
     text = strip_evil_whitespace(text)
-    if dry_run:
+    if options.dry:
       return r'\texttt{<Python>}'
     try:
         return str(eval(text,vars))
@@ -94,46 +95,58 @@ def produce_tex(text, var_table):
     return preamble + "\n\\newpage\n".join(copies) + endamble
 
 
-if len(sys.argv) < 3:
-    print "Usage:"
-    print "python mailmerge.py [-oocalc] template.tex data.csv"
-    print "or"
-    print "python mailmerge.py [-oocalc] -dry template.tex"
-    print "The -oocalc switch makes this work with csv produced by oocalc"
-    print "The -dry switch produces output were all Python code is replaced by '<Python>'"
+usage = "usage: python %prog [options] template.tex [data.csv]"
+parser = OptionParser(usage)
+parser.add_option('--oocalc',
+                  action = 'store_true',
+                  dest = 'oocalc',
+                  default = False,
+                  help = 'Switch csv format from ","-separated (Excel default) to ";"-separated (OOCalc default)')
+parser.add_option('-d','--dry',
+                  action='store_true',
+                  dest = 'dry',
+                  default = False,
+                  help = 'Switch to dry run mode. Don\'t require a csv, replace code block by dummy strings')
+parser.add_option('-o','--out',
+                  dest = "out",
+                  default = 'out.tex',
+                  help = 'Set the output file. Default: %default') 
+
+
+
+options, args = parser.parse_args(sys.argv)
+if len(args) < 3 and not options.dry or len(args)<2:
+    parser.print_help()
     sys.exit(-1)
 
-try:
-    sys.argv.remove('-oocalc')
-    dialect = OOCalc
-except ValueError:
-    dialect = csv.excel
+if options.oocalc:
+    options.dialect = OOCalc
+else:
+    options.dialect = csv.excel
 
-try:
-    sys.argv.remove('-dry')
-    dry_run = True
-    variables = {'dry':['dry']}
+if options.dry:
     print "Dry run mode"
-except ValueError:
-    dry_run = False
-    variables_table = sys.argv[2]
-    variables = parse(variables_table, dialect)
+    variables = {'dry':['dry']}
+else:
+    variables_table = args[2]
+    variables = parse(variables_table, options.dialect)
     print 'Available variables', variables.keys()
  
-template_file = sys.argv[1]
+template_file = args[1]
 f = open(template_file, 'rb')
 template_text = f. read()
 f.close()
 
 print "Producing output from template file", template_file,
-if dry_run:
-  print '\n'
+if options.dry:
+  print 
 else:
   print "and data", variables_table
+print "Storing things into", options.out
 print "Will produce",str(min((len(variables[column]) for column in variables))),"\"pages\"(s) output"
 
 
 output = produce_tex(template_text, variables)
-f = open('out.tex','wb')
+f = open(options.out,'wb')
 f.write(output)
 f.close()
