@@ -9,6 +9,32 @@ from optparse import OptionParser
 class OOCalc(csv.excel):
   delimiter = ';'
 
+magic_text = '_text'
+magic_line = '_line'
+dummy_text = '\\texttt{<Python>}'
+
+class MagicValue(float):
+  def __init__(self):
+    float.__init__(42)
+    
+  def __str__(self):
+    return dummy_text
+
+  def __call__(self,*args):
+    return self
+
+class MagicEnvironment(dict):
+  def __init__(self):
+    self.text = dummy_text
+    self.dict = dict()
+    self.__setitem__ = self.dict.__setitem__
+    
+  def __getitem__(self,k):
+    if k in self.dict:
+      return dict[k]
+    return MagicValue()
+
+
 def parse(filename, d):
     f = open(filename,'rb')
     reader = csv.DictReader(f, dialect = d)
@@ -35,21 +61,16 @@ def strip_evil_whitespace(text):
   
   return '\n'.join(lines)
 
-
 def eval_region(text, vars):
     text = strip_evil_whitespace(text)
-    if options.dry:
-      return r'\texttt{<Python>}'
     try:
         return str(eval(text,vars))
     except:
         exec(text,vars)
-        return str(vars["_text"])
-        
-
+        return str(vars[magic_text])
 
 def fill_template(template, vars):
-    blocks = [] #blocks of text
+    blocks = []
     pos = 0
     pattern = re.compile(r'\\begin\{python\}(.*?)\\end\{python\}',re.DOTALL)
     for match in pattern.finditer(template):
@@ -60,7 +81,7 @@ def fill_template(template, vars):
         try:
             blocks.append(eval_region(python,vars))
         except:
-            print "Can't successfully execute code block starting at", match.start(1)
+            print "Can't successfully execute code block"
             print python
             raise
 
@@ -68,12 +89,19 @@ def fill_template(template, vars):
     return "".join(blocks)
 
 def all_copies(template, var_table):
-    copies = []
+    if options.dry:
+      try:
+        return [fill_template(template, MagicEnvironment())]
+      except:
+        print "Error in dry run mode"
+        raise
+      
+    copies = []      
     for i in xrange(min((len(variables[column]) for column in var_table))):
         v = {}
         for k in var_table.iterkeys():
             v[k] = var_table[k][i]
-        v['_line'] = i
+        v[magic_line] = i
         try:
 	    copies.append(fill_template(template,v))
         except:
@@ -119,6 +147,8 @@ if len(args) < 3 and not options.dry or len(args)<2:
     parser.print_help()
     sys.exit(-1)
 
+template_file = args[1]
+
 if options.oocalc:
     options.dialect = OOCalc
 else:
@@ -126,27 +156,28 @@ else:
 
 if options.dry:
     print "Dry run mode"
-    variables = {'dry':['dry']}
+    variables = None
 else:
     variables_table = args[2]
     variables = parse(variables_table, options.dialect)
     print 'Available variables', variables.keys()
- 
-template_file = args[1]
-f = open(template_file, 'rb')
-template_text = f. read()
-f.close()
 
 print "Producing output from template file", template_file,
 if options.dry:
   print 
 else:
   print "and data", variables_table
-print "Storing things into", options.out
-print "Will produce",str(min((len(variables[column]) for column in variables))),"\"pages\"(s) output"
+  print "Will produce",str(min((len(variables[column]) for column in variables))),"\"pages\"(s) output"
 
+print "Storing things into", options.out
+
+
+f = open(template_file, 'rb')
+template_text = f. read()
+f.close()
 
 output = produce_tex(template_text, variables)
+
 f = open(options.out,'wb')
 f.write(output)
 f.close()
