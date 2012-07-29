@@ -25,6 +25,6 @@ Magic Variables
 In your template you can use the following magic variables:
 
 * `_text`: Assign to this in Python statements. The code block will be replaced by the value of `_text`
-* `_line`: An integer that set to the current line of the csv.
+* `_line`: An integer that is set to the current line of the csv.
 
 Besides these every column header in your csv defines one variable.
