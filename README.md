@@ -1,3 +1,5 @@
+Updates in this fork: Added support for XML files with the data
+
 latex-mailmerge
 ===============
 
