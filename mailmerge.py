@@ -133,18 +133,18 @@ def produce_tex(text, var_table):
     return preamble + "\n\\newpage\n".join(copies) + endamble
 
 
-usage = "usage: python %prog [options] template.tex [data.csv]"
+usage = "usage: python %prog [options] template.tex [data.csv/xml]"
 parser = OptionParser(usage)
 parser.add_option('--oocalc',
                   action = 'store_true',
                   dest = 'oocalc',
                   default = False,
-                  help = 'Switch csv format from ","-separated (Excel default) to ";"-separated (OOCalc default)')
+                  help = 'Switch csv format from ","-separated (Excel default) to ";"-separated (OOCalc default). Does nothing for XML files.')
 parser.add_option('-d','--dry',
                   action='store_true',
                   dest = 'dry',
                   default = False,
-                  help = 'Switch to dry run mode. Don\'t require a csv, replace code block by dummy strings')
+                  help = 'Switch to dry run mode. Don\'t require a csv/xml, replace code block by dummy strings')
 parser.add_option('-o','--out',
                   dest = "out",
                   default = 'out.tex',
