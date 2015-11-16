@@ -5,6 +5,7 @@ import csv
 from collections import defaultdict
 import string
 from optparse import OptionParser
+import xml.etree.ElementTree as ET
 
 class OOCalc(csv.excel):
   delimiter = ';'
@@ -45,6 +46,15 @@ def parse(filename, d):
             values[header].append(value)
             
     f.close()
+    return values
+
+def parse_xml(filename,tag):
+    # Extracts all the elemnets under <tag>
+    root = ET.parse(filename)
+    values = defaultdict(list)
+    for position in root.iter(tag):
+        for field in position:
+          values[field.tag].append(field.text)
     return values
 
 def strip_evil_whitespace(text):
@@ -159,7 +169,11 @@ if options.dry:
     variables = None
 else:
     variables_table = args[2]
-    variables = parse(variables_table, options.dialect)
+    if variables_table.endswith('.xml'):
+      # use tag position for the ad information
+      variables = parse_xml(variables_table,'position')
+    else:
+      variables = parse(variables_table, options.dialect)
     print 'Available variables', variables.keys()
 
 print "Producing output from template file", template_file,
